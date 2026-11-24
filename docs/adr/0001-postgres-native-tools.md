@@ -16,7 +16,8 @@ and a backup tool's worst failure is a restore that silently stops early.
 
 - Base backups come from `pg_basebackup`; WAL comes from `archive_command`; restore uses
   Postgres's own recovery with a generated `restore_command`.
-- Vaultkeep owns the catalogue, verification, retention, storage, scheduling and drills.
+- Vaultkeep owns the catalogue, verification, crash-safe archiving, retention, scheduling and
+  drills. How archiving is made crash-safe is decided in ADR 0002.
 - WAL positions and file names are computed exactly as Postgres does (`vaultkeep.lsn`,
   `vaultkeep.walnames`) and checked against a real server in tests.
 
@@ -24,6 +25,8 @@ and a backup tool's worst failure is a restore that silently stops early.
 
 - Restores are as reliable as Postgres's own recovery, and an operator can restore by hand
   with standard tools if Vaultkeep is unavailable.
-- Tests need the Postgres server binaries (`initdb`, `pg_ctl`, `pg_basebackup`) on the path.
+- Tests need the Postgres server binaries and tools (`initdb`, `pg_ctl`, `pg_basebackup`,
+  `pg_verifybackup`, `pg_waldump`, `pg_controldata`) on the path. They also serve as the
+  referee: Vaultkeep's answers are checked against theirs.
 - Logical backups (`pg_dump`) are out of scope; the README says where they are still the
   right tool.
